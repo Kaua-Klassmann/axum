@@ -1,17 +1,12 @@
 use routes::configure_routes;
 use tokio::net::TcpListener;
-use tower_http::cors::{Any, CorsLayer};
 
+mod config;
 mod handlers;
 mod routes;
 
 #[tokio::main]
 async fn main() {
-    let cors: CorsLayer = CorsLayer::new()
-        .allow_origin(Any)
-        .allow_methods(Any)
-        .allow_headers(Any);
-
     let app_port: u16 = dotenvy::var("APP_PORT")
         .ok()
         .and_then(|p: String| p.parse().ok())
@@ -22,7 +17,7 @@ async fn main() {
     let listener: TcpListener = TcpListener::bind(address).await.unwrap();
 
     let routes = configure_routes()
-        .layer(cors);
+        .layer((*config::cors::CORS).clone());
 
     println!("\nServer running in port {}", app_port);
 
