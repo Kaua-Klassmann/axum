@@ -1,3 +1,4 @@
+use axum::Router;
 use routes::configure_routes;
 use tokio::net::TcpListener;
 
@@ -16,7 +17,7 @@ async fn main() {
 
     let listener: TcpListener = TcpListener::bind(address).await.unwrap();
 
-    let routes = configure_routes()
+    let routes: Router = configure_routes()
         .layer((*config::cors::CORS).clone());
 
     println!("\nServer running in port {}", app_port);
