@@ -1,5 +1,7 @@
 use axum::Router;
+use migration::MigratorTrait;
 use routes::configure_routes;
+use sea_orm::{Database, DatabaseConnection};
 use tokio::net::TcpListener;
 
 mod config;
@@ -16,6 +18,10 @@ async fn main() {
     let address: String = format!("0.0.0.0:{}", app_port);
 
     let listener: TcpListener = TcpListener::bind(address).await.unwrap();
+
+    let db: DatabaseConnection = Database::connect((*config::database::DB_OPTIONS).clone())
+        .await.expect("Failed to connect on database");
+    migration::Migrator::up(&db, None).await.unwrap();
 
     let routes: Router = configure_routes()
         .layer((*config::cors::CORS).clone());
