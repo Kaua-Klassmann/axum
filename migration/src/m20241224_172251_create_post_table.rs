@@ -26,6 +26,10 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Post::Image)
                         .string()
                     )
+                    .col(ColumnDef::new(Post::Date)
+                        .date_time()
+                        .not_null()
+                    )
                     .col(ColumnDef::new(Post::UserId)
                         .integer()
                         .not_null()
@@ -53,5 +57,6 @@ enum Post {
     Uuid,
     Name,
     Image,
+    Date,
     UserId,
 }
