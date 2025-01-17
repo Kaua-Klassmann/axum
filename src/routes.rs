@@ -11,4 +11,5 @@ pub fn configure_routes() -> Router {
         .route("/path/{name}", post(path_handlers::path))
         .route("/query", post(query_handlers::query))
         .route("/generic_query", post(query_handlers::generic_query))
+        .route("/json", post(json_handlers::json))
 }
