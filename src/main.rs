@@ -1,11 +1,15 @@
+use tokio::net::TcpListener;
+
+mod config;
 mod handlers;
 mod routes;
 
 #[tokio::main]
 async fn main() {
-    let app = routes::configure_routes();
+    let app = routes::configure_routes()
+        .layer((*config::cors::CORS).clone());
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let listener = TcpListener::bind("0.0.0.0:3000").await.unwrap();
 
     println!("Listening on port 3000");
 
