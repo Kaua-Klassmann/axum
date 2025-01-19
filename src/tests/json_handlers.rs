@@ -1,18 +1,13 @@
 #[cfg(test)]
 mod test_post_json {
-    use std::sync::LazyLock;
-
-    use axum::{http::StatusCode, Router};
-    use axum_test::TestServer;
+    use axum::http::StatusCode;
     use serde::{Deserialize, Serialize};
 
-    use crate::routes::configure_routes;
-
-    static APP: LazyLock<Router> = LazyLock::new(configure_routes);
+    use crate::tests::setup_server::setup_server::setup_server;
 
     #[tokio::test]
     async fn error_without_json() {
-        let server = TestServer::builder().build((*APP).clone()).unwrap();
+        let server = setup_server();
 
         let response = server.post("/json").await;
 
@@ -24,7 +19,7 @@ mod test_post_json {
         #[derive(Serialize)]
         struct RequestPayload;
 
-        let server = TestServer::builder().build((*APP).clone()).unwrap();
+        let server = setup_server();
 
         let response = server.post("/json")
             .json(&RequestPayload{})
@@ -46,7 +41,7 @@ mod test_post_json {
             has_3_or_more_letters: bool
         }
 
-        let server = TestServer::builder().build((*APP).clone()).unwrap();
+        let server = setup_server();
 
         let response = server.post("/json")
             .json(&RequestPayload {
@@ -74,7 +69,7 @@ mod test_post_json {
             has_3_or_more_letters: bool
         }
 
-        let server = TestServer::builder().build((*APP).clone()).unwrap();
+        let server = setup_server();
 
         let response = server.post("/json")
             .json(&RequestPayload {

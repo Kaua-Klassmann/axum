@@ -1,17 +1,12 @@
 #[cfg(test)]
 mod test_post_query {
-    use std::sync::LazyLock;
+    use axum::http::StatusCode;
 
-    use axum::{http::StatusCode, Router};
-    use axum_test::TestServer;
-
-    use crate::routes::configure_routes;
-
-    static APP: LazyLock<Router> = LazyLock::new(configure_routes);
+    use crate::tests::setup_server::setup_server::setup_server;
 
     #[tokio::test]
     async fn error_without_name() {
-        let server = TestServer::builder().build((*APP).clone()).unwrap();
+        let server = setup_server();
 
         let response = server.post("/query").await;
 
@@ -20,7 +15,7 @@ mod test_post_query {
 
     #[tokio::test]
     async fn success() {
-        let server = TestServer::builder().build((*APP).clone()).unwrap();
+        let server = setup_server();
 
         let response = server.post("/query?name=Test").await;
 
