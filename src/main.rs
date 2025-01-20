@@ -6,6 +6,8 @@ use tokio::net::TcpListener;
 mod config;
 mod handlers;
 mod routes;
+
+#[cfg(test)]
 mod tests;
 
 #[tokio::main]

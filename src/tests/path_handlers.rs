@@ -1,6 +1,5 @@
-#[cfg(test)]
 mod test_post_path_{
-    use crate::tests::setup_server::setup_server::setup_server;
+    use crate::tests::setup_server::setup_server;
 
     #[tokio::test]
     async fn success() {

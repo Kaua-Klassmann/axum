@@ -1,8 +1,7 @@
-#[cfg(test)]
 mod test_post_query {
     use axum::http::StatusCode;
 
-    use crate::tests::setup_server::setup_server::setup_server;
+    use crate::tests::setup_server::setup_server;
 
     #[tokio::test]
     async fn error_without_name() {

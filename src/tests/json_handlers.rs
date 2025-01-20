@@ -1,9 +1,8 @@
-#[cfg(test)]
 mod test_post_json {
     use axum::http::StatusCode;
     use serde::{Deserialize, Serialize};
 
-    use crate::tests::setup_server::setup_server::setup_server;
+    use crate::tests::setup_server::setup_server;
 
     #[tokio::test]
     async fn error_without_json() {
