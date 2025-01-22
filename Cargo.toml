@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [profile.release]
-opt-level = 3 # Melhor otimização para desempenho
 lto = "fat" # Melhor otimização no linker para desempenho e tamanho do binário
 codegen-units = 1 # Define o número de geradores de código 
 split-debuginfo = "unpacked" # Define o código de depuração em binário separado
 debug = true
+overflow-checks = true
 
 [dependencies]
 axum = "0.8.1"
