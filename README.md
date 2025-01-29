@@ -15,5 +15,5 @@ sea-orm-cli migrate generate create_table_<TABLE_NAME>
 ## Comando para gerar as entities
 
 ```
-sea-orm-cli generate entity -o entity/src -u <DATABASE_URL>
+sea-orm-cli generate entity -o entity/src
 ```
