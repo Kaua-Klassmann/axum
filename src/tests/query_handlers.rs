@@ -1,11 +1,11 @@
 mod test_post_query {
     use axum::http::StatusCode;
 
-    use crate::tests::setup_server::setup_server;
+    use crate::tests::setup_server;
 
     #[tokio::test]
     async fn error_without_name() {
-        let server = setup_server();
+        let server = setup_server().await;
 
         let response = server.post("/query").await;
 
@@ -14,7 +14,7 @@ mod test_post_query {
 
     #[tokio::test]
     async fn success() {
-        let server = setup_server();
+        let server = setup_server().await;
 
         let response = server.post("/query?name=Test").await;
 

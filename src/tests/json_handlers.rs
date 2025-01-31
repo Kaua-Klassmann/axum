@@ -2,11 +2,11 @@ mod test_post_json {
     use axum::http::StatusCode;
     use serde::{Deserialize, Serialize};
 
-    use crate::tests::setup_server::setup_server;
+    use crate::tests::setup_server;
 
     #[tokio::test]
     async fn error_without_json() {
-        let server = setup_server();
+        let server = setup_server().await;
 
         let response = server.post("/json").await;
 
@@ -18,7 +18,7 @@ mod test_post_json {
         #[derive(Serialize)]
         struct RequestPayload;
 
-        let server = setup_server();
+        let server = setup_server().await;
 
         let response = server.post("/json")
             .json(&RequestPayload{})
@@ -40,7 +40,7 @@ mod test_post_json {
             has_3_or_more_letters: bool
         }
 
-        let server = setup_server();
+        let server = setup_server().await;
 
         let response = server.post("/json")
             .json(&RequestPayload {
@@ -68,7 +68,7 @@ mod test_post_json {
             has_3_or_more_letters: bool
         }
 
-        let server = setup_server();
+        let server = setup_server().await;
 
         let response = server.post("/json")
             .json(&RequestPayload {
