@@ -19,6 +19,7 @@ pub async fn configure_routes() -> Router {
         .route("/path/{name}", post(path_handlers::path))
         .route("/query", post(query_handlers::query))
         .route("/json", post(json_handlers::json))
+        .route("/create_user", post(user_handlers::create_user))
         .layer(get_cors())
         .with_state(state)
 }
