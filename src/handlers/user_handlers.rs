@@ -37,7 +37,7 @@ pub async fn create_user(
 ) -> Result<impl IntoResponse, (StatusCode, Json<CreateUserErrorResponse>)> {
 
     if payload.validate().is_err() {
-        return Err((StatusCode::BAD_REQUEST, Json(CreateUserErrorResponse {
+        return Err((StatusCode::UNPROCESSABLE_ENTITY, Json(CreateUserErrorResponse {
             error: "Schema invalid".to_string()
         })))
     }
