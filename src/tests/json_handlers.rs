@@ -1,24 +1,29 @@
 mod test_post_json {
     use axum::http::StatusCode;
+    use axum_test::TestServer;
     use serde::{Deserialize, Serialize};
 
     use crate::tests::setup_server;
 
     #[tokio::test]
-    async fn error_without_json() {
+    async fn tests() {
         let server = setup_server().await;
 
+        error_without_json(server).await;
+        error_without_name(server).await;
+        has_2_or_less_letters(server).await;
+        has_3_or_more_letters(server).await;
+    }
+
+    async fn error_without_json(server: &TestServer) {
         let response = server.post("/json").await;
 
         response.assert_status(StatusCode::UNSUPPORTED_MEDIA_TYPE);
     }
 
-    #[tokio::test]
-    async fn error_without_name() {
+    async fn error_without_name(server: &TestServer) {
         #[derive(Serialize)]
         struct RequestPayload;
-
-        let server = setup_server().await;
 
         let response = server.post("/json")
             .json(&RequestPayload{})
@@ -27,8 +32,7 @@ mod test_post_json {
         response.assert_status(StatusCode::UNPROCESSABLE_ENTITY);
     }
 
-    #[tokio::test]
-    async fn has_2_or_less_letters() {
+    async fn has_2_or_less_letters(server: &TestServer) {
         #[derive(Serialize)]
         struct RequestPayload {
             name: String
@@ -39,8 +43,6 @@ mod test_post_json {
             name: String,
             has_3_or_more_letters: bool
         }
-
-        let server = setup_server().await;
 
         let response = server.post("/json")
             .json(&RequestPayload {
@@ -55,8 +57,7 @@ mod test_post_json {
         });
     }
 
-    #[tokio::test]
-    async fn has_3_or_more_letters() {
+    async fn has_3_or_more_letters(server: &TestServer) {
         #[derive(Serialize)]
         struct RequestPayload {
             name: String
@@ -67,8 +68,6 @@ mod test_post_json {
             name: String,
             has_3_or_more_letters: bool
         }
-
-        let server = setup_server().await;
 
         let response = server.post("/json")
             .json(&RequestPayload {

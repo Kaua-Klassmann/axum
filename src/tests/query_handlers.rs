@@ -1,21 +1,24 @@
 mod test_post_query {
     use axum::http::StatusCode;
+    use axum_test::TestServer;
 
     use crate::tests::setup_server;
 
     #[tokio::test]
-    async fn error_without_name() {
+    async fn tests() {
         let server = setup_server().await;
 
+        error_without_name(server).await;
+        success(server).await
+    }
+
+    async fn error_without_name(server: &TestServer) {
         let response = server.post("/query").await;
 
         response.assert_status(StatusCode::BAD_REQUEST);
     }
 
-    #[tokio::test]
-    async fn success() {
-        let server = setup_server().await;
-
+    async fn success(server: &TestServer) {
         let response = server.post("/query?name=Test").await;
 
         response.assert_status(StatusCode::OK);
