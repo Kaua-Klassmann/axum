@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use argon2::password_hash::{rand_core::OsRng, SaltString, PasswordHasher};
 use axum::{
     extract::State, http::StatusCode, response::IntoResponse, Json
@@ -32,7 +30,7 @@ struct CreateUserResponse {
 }
 
 pub async fn create_user(
-    State(state): State<Arc<AppState>>,
+    State(state): State<AppState>,
     Json(payload): Json<CreateUserPayload>
 ) -> Result<impl IntoResponse, (StatusCode, Json<CreateUserErrorResponse>)> {
 
