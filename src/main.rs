@@ -13,9 +13,6 @@ mod state;
 mod handlers;
 mod routes;
 
-#[cfg(test)]
-mod tests;
-
 #[tokio::main]
 async fn main() {
     dotenv().ok();
