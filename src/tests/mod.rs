@@ -14,6 +14,7 @@ use crate::{
 mod path_handlers;
 mod query_handlers;
 mod json_handlers;
+mod user_handlers;
 
 static SERVER: OnceCell<TestServer> = OnceCell::const_new();
 
@@ -22,7 +23,7 @@ pub async fn setup_server() -> &'static TestServer {
         dotenv().ok();
 
         let db_conn = get_db_connection().await;
-        let argon2 = Arc::new(Argon2::default());
+        let argon2: Arc<Argon2<'static>> = Arc::new(Argon2::default());
 
         let state = AppState {
             db_conn,
