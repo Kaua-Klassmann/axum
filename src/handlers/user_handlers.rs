@@ -9,6 +9,11 @@ use validator::Validate;
 use crate::state::AppState;
 use entity::user;
 
+#[derive(Serialize)]
+pub struct ErrorResponse {
+    error: String
+}
+
 #[derive(Deserialize, Validate)]
 pub struct CreateUserPayload {
     #[validate(length(min = 1))]
@@ -20,11 +25,6 @@ pub struct CreateUserPayload {
 }
 
 #[derive(Serialize)]
-pub struct CreateUserErrorResponse {
-    error: String
-}
-
-#[derive(Serialize)]
 struct CreateUserResponse {
     id: i32
 }
@@ -32,10 +32,10 @@ struct CreateUserResponse {
 pub async fn create_user(
     State(state): State<AppState>,
     Json(payload): Json<CreateUserPayload>
-) -> Result<impl IntoResponse, (StatusCode, Json<CreateUserErrorResponse>)> {
+) -> Result<impl IntoResponse, (StatusCode, Json<ErrorResponse>)> {
 
     if payload.validate().is_err() {
-        return Err((StatusCode::UNPROCESSABLE_ENTITY, Json(CreateUserErrorResponse {
+        return Err((StatusCode::UNPROCESSABLE_ENTITY, Json(ErrorResponse {
             error: "Schema invalid".to_string()
         })))
     }
@@ -58,7 +58,7 @@ pub async fn create_user(
     let res = user::Entity::insert(user).exec(db).await;
 
     if res.is_err() {
-        return Err((StatusCode::BAD_REQUEST, Json(CreateUserErrorResponse {
+        return Err((StatusCode::BAD_REQUEST, Json(ErrorResponse {
             error: "Failed to create account".to_string()
         })))
     }
