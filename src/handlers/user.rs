@@ -1,18 +1,14 @@
-use argon2::password_hash::{rand_core::OsRng, SaltString, PasswordHasher};
+use argon2::{password_hash::{rand_core::OsRng, PasswordHasher, PasswordVerifier, SaltString}, PasswordHash};
 use axum::{
     extract::State, http::StatusCode, response::IntoResponse, Json
 };
-use sea_orm::{ActiveValue::Set, EntityTrait};
-use serde::{Deserialize, Serialize};
+use sea_orm::{ActiveValue::Set, EntityTrait, QueryFilter, ColumnTrait};
+use serde::Deserialize;
+use serde_json::json;
 use validator::Validate;
 
-use crate::state::AppState;
+use crate::{jwt::JwtClaims, state::AppState};
 use entity::user;
-
-#[derive(Serialize)]
-pub struct ErrorResponse {
-    error: String
-}
 
 #[derive(Deserialize, Validate)]
 pub struct CreateUserPayload {
@@ -24,19 +20,14 @@ pub struct CreateUserPayload {
     password: String
 }
 
-#[derive(Serialize)]
-struct CreateUserResponse {
-    id: i32
-}
-
 pub async fn create_user(
     State(state): State<AppState>,
     Json(payload): Json<CreateUserPayload>
-) -> Result<impl IntoResponse, (StatusCode, Json<ErrorResponse>)> {
+) -> impl IntoResponse {
 
     if payload.validate().is_err() {
-        return Err((StatusCode::UNPROCESSABLE_ENTITY, Json(ErrorResponse {
-            error: "Schema invalid".to_string()
+        return (StatusCode::UNPROCESSABLE_ENTITY, Json(json!({
+            "error": "Schema invalid".to_string()
         })))
     }
 
@@ -58,12 +49,65 @@ pub async fn create_user(
     let res = user::Entity::insert(user).exec(db).await;
 
     if res.is_err() {
-        return Err((StatusCode::BAD_REQUEST, Json(ErrorResponse {
-            error: "Failed to create account".to_string()
+        return (StatusCode::BAD_REQUEST, Json(json!({
+            "error": "Failed to create account".to_string()
         })))
     }
 
-    Ok((StatusCode::OK, Json(CreateUserResponse {
-        id: res.unwrap().last_insert_id
+    (StatusCode::OK, Json(json!({
+        "id": res.unwrap().last_insert_id
+    })))
+}
+
+#[derive(Deserialize, Validate)]
+pub struct LoginPayload {
+    #[validate(email)]
+    email: String,
+    #[validate(length(min = 6))]
+    password: String
+}
+
+pub async fn login(
+    State(state): State<AppState>,
+    Json(payload): Json<LoginPayload>
+) -> impl IntoResponse {
+
+    if payload.validate().is_err() {
+        return (StatusCode::BAD_REQUEST, Json(json!({
+            "error": "Schema invalid".to_string()
+        })))
+    }
+
+    let db = &state.db_conn;
+    let argon2 = &state.argon2;
+
+    let user_result = user::Entity::find()
+        .filter(user::Column::Email.eq(payload.email))
+        .one(db)
+        .await
+        .unwrap();
+
+    if user_result.is_none() {
+        return (StatusCode::BAD_REQUEST, Json(json!({
+            "error": "User not found".to_string()
+        })))
+    }
+
+    let user_data = user_result.unwrap();
+    let parsed_hash = PasswordHash::new(&user_data.password).unwrap();
+
+    if argon2.verify_password(
+        payload.password.as_bytes(),
+        &parsed_hash
+    ).is_err() {
+        return (StatusCode::BAD_REQUEST, Json(json!({
+            "error": "Password incorrect".to_string()
+        })))
+    }
+
+    let jwt_token = JwtClaims::new(user_data.id).gen_token();
+
+    (StatusCode::OK, Json(json!({
+        "token": jwt_token
     })))
 }

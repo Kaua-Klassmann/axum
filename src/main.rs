@@ -10,6 +10,7 @@ use tokio::net::TcpListener;
 mod config;
 mod database;
 mod state;
+mod jwt;
 mod handlers;
 mod routes;
 
