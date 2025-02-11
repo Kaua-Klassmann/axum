@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use axum::{
     extract::FromRequestParts,
     http::{request::Parts, StatusCode},
@@ -8,23 +10,25 @@ use axum::{
 use axum_extra::{headers::{authorization::Bearer, Authorization}, TypedHeader};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 
 use crate::config::jwt::get_jwt_opts;
 
 #[derive(Serialize, Deserialize)]
 pub struct JwtClaims {
-    pub user_id: i32
-}
-
-#[derive(Serialize)]
-struct Error {
-    error: String
+    pub user_id: i32,
+    exp: usize
 }
 
 impl JwtClaims {
     pub fn new(user_id: i32) -> Self {
+        let jwt_opts = get_jwt_opts();
+
+        let expiration_hours = jwt_opts.expiration.parse::<u64>().unwrap();
+
         JwtClaims {
-            user_id
+            user_id,
+            exp: Duration::from_secs(expiration_hours * 60 * 60).as_secs() as usize
         }
     }
 
@@ -41,7 +45,7 @@ impl JwtClaims {
         .unwrap()
     }
 
-    pub fn parse_token(token: &str) -> Result<JwtClaims, impl IntoResponse> {
+    pub fn parse_token(token: String) -> Result<JwtClaims, impl IntoResponse> {
         let jwt_opts = get_jwt_opts();
 
         let secret = jwt_opts.secret.as_bytes();
@@ -63,9 +67,9 @@ pub enum Errors {
 
 impl IntoResponse for Errors {
     fn into_response(self) -> axum::response::Response {
-        (StatusCode::UNAUTHORIZED, Json(Error {
-            error: "Invalid token".to_string()
-        })).into_response()
+        (StatusCode::UNAUTHORIZED, Json(json!({
+            "error": "Invalid token".to_string()
+        }))).into_response()
     }
 }
 
@@ -82,7 +86,7 @@ where
             return Err(Errors::InvalidToken)
         };
 
-        let user_data = JwtClaims::parse_token(bearer.token())
+        let user_data = JwtClaims::parse_token(bearer.token().to_string())
             .map_err(|_| {
                 Errors::InvalidToken
             });
