@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use axum::{
     extract::FromRequestParts,
     http::{request::Parts, StatusCode},
@@ -22,13 +20,9 @@ pub struct JwtClaims {
 
 impl JwtClaims {
     pub fn new(user_id: i32) -> Self {
-        let jwt_opts = get_jwt_opts();
-
-        let expiration_hours = jwt_opts.expiration.parse::<u64>().unwrap();
-
         JwtClaims {
             user_id,
-            exp: Duration::from_secs(expiration_hours * 60 * 60).as_secs() as usize
+            exp: usize::MAX
         }
     }
 
