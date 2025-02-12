@@ -27,7 +27,7 @@ pub async fn create_user(
 
     if payload.validate().is_err() {
         return (StatusCode::UNPROCESSABLE_ENTITY, Json(json!({
-            "error": "Schema invalid".to_string()
+            "error": "Schema invalid"
         })))
     }
 
@@ -50,7 +50,7 @@ pub async fn create_user(
 
     if res.is_err() {
         return (StatusCode::BAD_REQUEST, Json(json!({
-            "error": "Failed to create account".to_string()
+            "error": "Failed to create account"
         })))
     }
 
@@ -74,7 +74,7 @@ pub async fn login(
 
     if payload.validate().is_err() {
         return (StatusCode::BAD_REQUEST, Json(json!({
-            "error": "Schema invalid".to_string()
+            "error": "Schema invalid"
         })))
     }
 
@@ -89,7 +89,7 @@ pub async fn login(
 
     if user_result.is_none() {
         return (StatusCode::BAD_REQUEST, Json(json!({
-            "error": "User not found".to_string()
+            "error": "User not found"
         })))
     }
 
@@ -101,7 +101,7 @@ pub async fn login(
         &parsed_hash
     ).is_err() {
         return (StatusCode::BAD_REQUEST, Json(json!({
-            "error": "Password incorrect".to_string()
+            "error": "Password incorrect"
         })))
     }
 
