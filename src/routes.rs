@@ -7,12 +7,18 @@ use crate::{handlers, state::AppState};
 
 pub fn configure_routes() -> Router<AppState> {
     Router::new()
+        .merge(default_routes())
+        .nest("/user", user_routes())
+        .nest("/post", post_routes())
+}
+
+fn default_routes() -> Router<AppState> {
+    Router::new()
         .route("/", get(|| async { "Hello World!" }))
         .route("/path/{name}", post(handlers::path::path))
         .route("/query", post(handlers::query::query))
         .route("/json", post(handlers::json::json))
-        .nest("/user", user_routes())
-        .merge(configure_protected_routes())
+        .route("/token", get(handlers::token::token))
 }
 
 fn user_routes() -> Router<AppState> {
@@ -21,7 +27,7 @@ fn user_routes() -> Router<AppState> {
         .route("/login", post(handlers::user::login))
 }
 
-fn configure_protected_routes() -> Router<AppState> {
+fn post_routes() -> Router<AppState> {
     Router::new()
-        .route("/token", get(handlers::token::token))
+        .route("/create", post(handlers::post::create_post))
 }
