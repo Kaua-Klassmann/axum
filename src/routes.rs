@@ -1,6 +1,6 @@
 use axum::{
     Router,
-    routing::{get, post}
+    routing::{get, post, put}
 };
 
 use crate::{handlers, state::AppState};
@@ -25,6 +25,7 @@ fn user_routes() -> Router<AppState> {
     Router::new()
         .route("/register", post(handlers::user::create_user))
         .route("/login", post(handlers::user::login))
+        .route("/update/name", put(handlers::user::update_name))
 }
 
 fn post_routes() -> Router<AppState> {

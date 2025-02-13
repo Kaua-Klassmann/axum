@@ -73,7 +73,7 @@ pub async fn login(
 ) -> impl IntoResponse {
 
     if payload.validate().is_err() {
-        return (StatusCode::BAD_REQUEST, Json(json!({
+        return (StatusCode::UNPROCESSABLE_ENTITY, Json(json!({
             "error": "Schema invalid"
         })))
     }
@@ -110,4 +110,44 @@ pub async fn login(
     (StatusCode::OK, Json(json!({
         "token": jwt_token
     })))
+}
+
+#[derive(Deserialize, Validate)]
+pub struct UpdateUserPayload {
+    #[validate(length(min = 1))]
+    name: String
+}
+
+pub async fn update_name(
+    State(state): State<AppState>,
+    token: JwtClaims,
+    Json(payload): Json<UpdateUserPayload>
+) -> impl IntoResponse {
+
+    if payload.validate().is_err() {
+        return (StatusCode::UNPROCESSABLE_ENTITY, Json(json!({
+            "error": "Schema invalid"
+        })))
+    }
+
+    let db = &state.db_conn;
+
+    let user = user::ActiveModel {
+        id: Set(token.user_id),
+        name: Set(payload.name),
+        ..Default::default()
+    };
+
+    let update_res = user::Entity::update(user)
+        .filter(user::Column::Id.eq(token.user_id))
+        .exec(db)
+        .await;
+
+    if update_res.is_err() {
+        return (StatusCode::BAD_REQUEST, Json(json!({
+            "error": "Failed to update user"
+        })))
+    }
+
+    (StatusCode::OK, Json(json!({})))
 }
