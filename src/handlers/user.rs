@@ -144,7 +144,7 @@ pub async fn update_name(
         .await;
 
     if update_res.is_err() {
-        return (StatusCode::BAD_REQUEST, Json(json!({
+        return (StatusCode::INTERNAL_SERVER_ERROR, Json(json!({
             "error": "Failed to update user"
         })))
     }
