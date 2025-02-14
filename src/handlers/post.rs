@@ -1,6 +1,13 @@
 use axum::{extract::{Path, State}, http::StatusCode, response::IntoResponse, Json};
 use entity::{post, user};
-use sea_orm::{ActiveValue::Set, EntityTrait, FromQueryResult, QueryFilter, QuerySelect, ColumnTrait};
+use sea_orm::{
+    ActiveValue::Set,
+    ColumnTrait,
+    EntityTrait,
+    FromQueryResult,
+    QueryFilter,
+    QuerySelect
+};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use uuid::Uuid;
@@ -144,4 +151,40 @@ pub async fn delete_post(
     }
 
     (StatusCode::OK, Json(json!({})))
+}
+
+pub async fn view_post(
+    State(state): State<AppState>,
+    _: JwtClaims,
+    Path(uuid_post): Path<Uuid>
+) -> impl IntoResponse {
+
+    let db = &state.db_conn;
+
+    let post_result = post::Entity::find()
+        .find_also_related(user::Entity)
+        .filter(post::Column::Uuid.eq(uuid_post))
+        .one(db)
+        .await
+        .unwrap();
+
+    if post_result.is_none() {
+        return (StatusCode::BAD_REQUEST, Json(json!({
+            "error": "Failed to find post"
+        })))
+    }
+
+    let (post, user_result) = post_result.unwrap();
+
+    let user = user_result.unwrap();
+
+    (StatusCode::OK, Json(json!({
+        "uuid": post.uuid,
+        "name": post.title,
+        "image": post.image,
+        "user": {
+            "id": user.id,
+            "name": user.name
+        }
+    })))
 }
