@@ -1,4 +1,4 @@
-use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
+use axum::{extract::{Path, State}, http::StatusCode, response::IntoResponse, Json};
 use entity::{post, user};
 use sea_orm::{ActiveValue::Set, EntityTrait, FromQueryResult, QueryFilter, QuerySelect, ColumnTrait};
 use serde::{Deserialize, Serialize};
@@ -104,4 +104,44 @@ pub async fn get_all_by_user(
     (StatusCode::OK, Json(json!({
         "posts": posts
     })))
+}
+
+pub async fn delete_post(
+    State(state): State<AppState>,
+    token: JwtClaims,
+    Path(uuid_post): Path<Uuid>
+) -> impl IntoResponse {
+    
+    let db = &state.db_conn;
+
+    let post_result = post::Entity::find_by_id(uuid_post)
+        .one(db)
+        .await
+        .unwrap();
+
+    if post_result.is_none() {
+        return (StatusCode::BAD_REQUEST, Json(json!({
+            "error": "Failed to find post"
+        })))
+    }
+
+    let post = post_result.unwrap();
+
+    if post.id_user != token.user_id {
+        return (StatusCode::UNAUTHORIZED, Json(json!({
+            "error": "Post is from other user"
+        })))
+    }
+
+    let delete_result = post::Entity::delete_by_id(post.uuid)
+        .exec(db)
+        .await;
+
+    if delete_result.is_err() {
+        return (StatusCode::INTERNAL_SERVER_ERROR, Json(json!({
+            "error": "Failed to delete post"
+        })))
+    }
+
+    (StatusCode::OK, Json(json!({})))
 }
