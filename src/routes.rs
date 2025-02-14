@@ -1,6 +1,5 @@
 use axum::{
-    Router,
-    routing::{get, post, put}
+    routing::{get, post, put}, Router
 };
 
 use crate::{handlers, state::AppState};
@@ -31,4 +30,5 @@ fn user_routes() -> Router<AppState> {
 fn post_routes() -> Router<AppState> {
     Router::new()
         .route("/create", post(handlers::post::create_post))
+        .route("/view/user", get(handlers::post::get_all_by_user))
 }
