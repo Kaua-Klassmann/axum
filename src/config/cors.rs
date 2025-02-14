@@ -1,6 +1,6 @@
 use std::env;
 
-use axum::http::HeaderValue;
+use axum::http::{HeaderValue, Method};
 use tower_http::cors::{Any, CorsLayer};
 
 pub fn get_cors() -> CorsLayer {
@@ -11,6 +11,6 @@ pub fn get_cors() -> CorsLayer {
 
     CorsLayer::new()
         .allow_origin(origin)
-        .allow_methods(Any)
+        .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
         .allow_headers(Any)
 }
