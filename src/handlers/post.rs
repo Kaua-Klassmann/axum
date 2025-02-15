@@ -60,7 +60,7 @@ pub async fn create_post(
 #[derive(Deserialize, Validate)]
 pub struct GetAllByUserPayload {
     #[validate(range(min = 1))]
-    id_user: i32
+    id_user: u32
 }
 
 #[derive(FromQueryResult, Serialize)]

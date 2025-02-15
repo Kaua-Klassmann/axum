@@ -14,12 +14,12 @@ use crate::config::jwt::get_jwt_opts;
 
 #[derive(Serialize, Deserialize)]
 pub struct JwtClaims {
-    pub user_id: i32,
+    pub user_id: u32,
     exp: usize
 }
 
 impl JwtClaims {
-    pub fn new(user_id: i32) -> Self {
+    pub fn new(user_id: u32) -> Self {
         JwtClaims {
             user_id,
             exp: usize::MAX
