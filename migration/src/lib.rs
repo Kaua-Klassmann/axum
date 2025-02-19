@@ -2,6 +2,7 @@ pub use sea_orm_migration::prelude::*;
 
 mod m20250128_212125_create_user_table;
 mod m20250128_212714_create_post_table;
+mod m20250218_210543_create_like_table;
 
 pub struct Migrator;
 
@@ -11,6 +12,7 @@ impl MigratorTrait for Migrator {
         vec![
             Box::new(m20250128_212125_create_user_table::Migration),
             Box::new(m20250128_212714_create_post_table::Migration),
+            Box::new(m20250218_210543_create_like_table::Migration),
         ]
     }
 }

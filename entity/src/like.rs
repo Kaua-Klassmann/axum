@@ -4,19 +4,25 @@ use sea_orm::entity::prelude::*;
 use uuid::Uuid;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "post")]
+#[sea_orm(table_name = "like")]
 pub struct Model {
-    #[sea_orm(primary_key, auto_increment = false, column_type = "Binary(16)")]
-    pub uuid: Uuid,
-    pub title: String,
-    pub image: String,
+    #[sea_orm(primary_key)]
+    pub id: u32,
     pub id_user: u32,
+    #[sea_orm(column_type = "Binary(16)")]
+    pub id_post: Uuid,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(has_many = "super::like::Entity")]
-    Like,
+    #[sea_orm(
+        belongs_to = "super::post::Entity",
+        from = "Column::IdPost",
+        to = "super::post::Column::Uuid",
+        on_update = "Restrict",
+        on_delete = "Restrict"
+    )]
+    Post,
     #[sea_orm(
         belongs_to = "super::user::Entity",
         from = "Column::IdUser",
@@ -27,9 +33,9 @@ pub enum Relation {
     User,
 }
 
-impl Related<super::like::Entity> for Entity {
+impl Related<super::post::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Like.def()
+        Relation::Post.def()
     }
 }
 
