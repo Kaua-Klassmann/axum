@@ -9,7 +9,7 @@ sea-orm-cli migrate init -d migration
 ## Comando para criar migration de uma tabela
 
 ```
-sea-orm-cli migrate generate create_table_<TABLE_NAME>
+sea-orm-cli migrate generate create_<TABLE_NAME>_table
 ```
 
 ## Comando para gerar as entities
