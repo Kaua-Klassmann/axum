@@ -5,7 +5,7 @@ use axum::{
     Json,
 };
 use entity::{like, post};
-use sea_orm::{EntityTrait, Set};
+use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, Set};
 use serde_json::json;
 use uuid::Uuid;
 
@@ -47,4 +47,34 @@ pub async fn like_post(
     }
 
     (StatusCode::OK, Json(json!({})))
+}
+
+pub async fn view_all_likes(State(state): State<AppState>, token: JwtClaims) -> impl IntoResponse {
+    let db = &state.db_conn;
+
+    let likes_result = like::Entity::find()
+        .find_also_related(post::Entity)
+        .filter(like::Column::IdUser.eq(token.user_id))
+        .all(db)
+        .await;
+
+    if likes_result.is_err() {
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({
+                "error": "Failed to find posts"
+            })),
+        );
+    }
+
+    let likes = likes_result.unwrap();
+
+    let posts: Vec<_> = likes.into_iter().map(|(_, post)| post).collect();
+
+    (
+        StatusCode::OK,
+        Json(json!({
+            "posts": posts
+        })),
+    )
 }

@@ -38,5 +38,7 @@ fn post_routes() -> Router<AppState> {
 }
 
 fn like_routes() -> Router<AppState> {
-    Router::new().route("/like/{post_uuid}", post(handlers::like::like_post))
+    Router::new()
+        .route("/{post_uuid}", post(handlers::like::like_post))
+        .route("/view", get(handlers::like::view_all_likes))
 }
