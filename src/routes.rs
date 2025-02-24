@@ -10,7 +10,6 @@ pub fn configure_routes() -> Router<AppState> {
         .merge(default_routes())
         .nest("/user", user_routes())
         .nest("/post", post_routes())
-        .nest("/like", like_routes())
 }
 
 fn default_routes() -> Router<AppState> {
@@ -35,10 +34,4 @@ fn post_routes() -> Router<AppState> {
         .route("/view/user", get(handlers::post::get_all_by_user))
         .route("/{uuid_post}/delete", delete(handlers::post::delete_post))
         .route("/{uuid_post}/view", get(handlers::post::view_post))
-}
-
-fn like_routes() -> Router<AppState> {
-    Router::new()
-        .route("/{post_uuid}", post(handlers::like::like_post))
-        .route("/view", get(handlers::like::view_all_likes))
 }
