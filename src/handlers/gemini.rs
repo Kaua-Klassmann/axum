@@ -1,12 +1,11 @@
 use std::{collections::HashMap, env};
 
-use axum::{http::StatusCode, response::IntoResponse, Json};
-use reqwest::Client;
+use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
 use serde::Deserialize;
 use serde_json::json;
 use validator::Validate;
 
-use crate::jwt::JwtClaims;
+use crate::{jwt::JwtClaims, state::AppState};
 
 #[derive(Deserialize, Validate)]
 pub struct ChatPayload {
@@ -34,7 +33,11 @@ struct Part {
     text: String,
 }
 
-pub async fn chat(_: JwtClaims, Json(payload): Json<ChatPayload>) -> impl IntoResponse {
+pub async fn chat(
+    _: JwtClaims,
+    State(state): State<AppState>,
+    Json(payload): Json<ChatPayload>,
+) -> impl IntoResponse {
     if payload.validate().is_err() {
         return (
             StatusCode::UNPROCESSABLE_ENTITY,
@@ -43,6 +46,8 @@ pub async fn chat(_: JwtClaims, Json(payload): Json<ChatPayload>) -> impl IntoRe
             })),
         );
     }
+
+    let client = &state.reqwest_client;
 
     let gemini_api = env::var("GEMINI_API").expect("GEMINI_API not found at .env file");
 
@@ -54,8 +59,6 @@ pub async fn chat(_: JwtClaims, Json(payload): Json<ChatPayload>) -> impl IntoRe
 
     let mut json_payload = HashMap::new();
     json_payload.insert("contents", [parts]);
-
-    let client = Client::new();
 
     let res_result = client.post(gemini_api).json(&json_payload).send().await;
 
