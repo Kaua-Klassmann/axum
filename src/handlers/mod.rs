@@ -1,3 +1,4 @@
+pub mod gemini;
 pub mod json;
 pub mod path;
 pub mod post;

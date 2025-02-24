@@ -10,6 +10,7 @@ pub fn configure_routes() -> Router<AppState> {
         .merge(default_routes())
         .nest("/user", user_routes())
         .nest("/post", post_routes())
+        .route("/gemini", post(handlers::gemini::chat))
 }
 
 fn default_routes() -> Router<AppState> {
