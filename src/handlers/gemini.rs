@@ -51,14 +51,13 @@ pub async fn chat(
 
     let gemini_api = env::var("GEMINI_API").expect("GEMINI_API not found at .env file");
 
-    let mut text = HashMap::new();
-    text.insert("text", payload.text);
-
-    let mut parts = HashMap::new();
-    parts.insert("parts", [text]);
-
-    let mut json_payload = HashMap::new();
-    json_payload.insert("contents", [parts]);
+    let json_payload = json!({
+        "contents": [{
+            "parts": [{
+                "text": payload.text
+            }]
+        }]
+    });
 
     let res_result = client.post(gemini_api).json(&json_payload).send().await;
 
