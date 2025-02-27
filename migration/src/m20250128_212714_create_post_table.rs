@@ -13,27 +13,20 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(Post::Table)
                     .if_not_exists()
-                    .col(ColumnDef::new(Post::Uuid)
-                        .uuid()
-                        .not_null()
-                        .primary_key()
+                    .col(ColumnDef::new(Post::Uuid).uuid().not_null().primary_key())
+                    .col(ColumnDef::new(Post::Title).string().not_null())
+                    .col(
+                        ColumnDef::new(Post::HasImage)
+                            .boolean()
+                            .default(false)
+                            .not_null(),
                     )
-                    .col(ColumnDef::new(Post::Title)
-                        .string()
-                        .not_null()
-                    )
-                    .col(ColumnDef::new(Post::Image)
-                        .string()
-                        .not_null()
-                    )
-                    .col(ColumnDef::new(Post::IdUser)
-                        .unsigned()
-                        .not_null()
-                    )
-                    .foreign_key(ForeignKey::create()
-                        .name("fk_post_user_id")
-                        .from(Post::Table, Post::IdUser)
-                        .to(User::Table, User::Id)
+                    .col(ColumnDef::new(Post::IdUser).unsigned().not_null())
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_post_user_id")
+                            .from(Post::Table, Post::IdUser)
+                            .to(User::Table, User::Id),
                     )
                     .to_owned(),
             )
@@ -52,6 +45,6 @@ pub enum Post {
     Table,
     Uuid,
     Title,
-    Image,
-    IdUser
+    HasImage,
+    IdUser,
 }

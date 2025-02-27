@@ -9,7 +9,7 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false, column_type = "Binary(16)")]
     pub uuid: Uuid,
     pub title: String,
-    pub image: String,
+    pub has_image: bool,
     pub id_user: u32,
 }
 
