@@ -8,5 +8,5 @@ use sea_orm::DatabaseConnection;
 pub struct AppState {
     pub db_conn: DatabaseConnection,
     pub argon2: Arc<Argon2<'static>>,
-    pub reqwest_client: Arc<ReqwestClient>,
+    pub http_client: Arc<ReqwestClient>,
 }

@@ -30,12 +30,12 @@ async fn main() {
 
     let db_conn = get_db_connection().await;
     let argon2 = Arc::new(Argon2::default());
-    let reqwest_client = Arc::new(ReqwestClient::new());
+    let http_client = Arc::new(ReqwestClient::new());
 
     let state = AppState {
         db_conn,
         argon2,
-        reqwest_client,
+        http_client,
     };
 
     let app = routes::configure_routes()

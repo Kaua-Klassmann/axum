@@ -1,4 +1,4 @@
-use std::{collections::HashMap, env};
+use std::env;
 
 use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
 use serde::Deserialize;
@@ -47,7 +47,7 @@ pub async fn chat(
         );
     }
 
-    let client = &state.reqwest_client;
+    let client = &state.http_client;
 
     let gemini_api = env::var("GEMINI_API").expect("GEMINI_API not found at .env file");
 
