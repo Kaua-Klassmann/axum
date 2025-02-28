@@ -1,13 +1,11 @@
-use std::{env, sync::Arc};
+use std::env;
 
-use argon2::Argon2;
-use config::cors::get_cors;
-use database::database::get_db_connection;
 use dotenvy::dotenv;
-use reqwest::Client as ReqwestClient;
-use state::AppState;
 use tokio::net::TcpListener;
 
+use crate::app::create_app;
+
+mod app;
 mod config;
 mod database;
 mod handlers;
@@ -26,21 +24,9 @@ async fn main() {
 
     let listener = TcpListener::bind(format!("0.0.0.0:{}", port))
         .await
-        .unwrap();
+        .expect("Port is already in use");
 
-    let db_conn = get_db_connection().await;
-    let argon2 = Arc::new(Argon2::default());
-    let http_client = Arc::new(ReqwestClient::new());
-
-    let state = AppState {
-        db_conn,
-        argon2,
-        http_client,
-    };
-
-    let app = routes::configure_routes()
-        .layer(get_cors())
-        .with_state(state);
+    let app = create_app().await;
 
     println!("Listening on port {}", port);
 
