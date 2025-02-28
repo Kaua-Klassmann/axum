@@ -5,7 +5,7 @@ use axum::Router;
 use reqwest::Client as ReqwestClient;
 
 use crate::{
-    config::cors::get_cors, database::database::get_db_connection, routes::configure_routes,
+    database::database::get_db_connection, middlewars::cors::get_cors, routes::configure_routes,
     state::AppState,
 };
 
