@@ -12,6 +12,7 @@ mod handlers;
 mod jwt;
 mod middlewars;
 mod routes;
+mod services;
 mod state;
 
 #[tokio::main]
