@@ -43,13 +43,8 @@ pub async fn create_user(
     }
 
     let db = &state.db_conn;
+    //let redis = &mut state.redis_conn.get().await.unwrap();
     let argon2 = &state.argon2;
-
-    let salt = SaltString::generate(&mut OsRng);
-    let password_hash = argon2
-        .hash_password(payload.password.as_bytes(), &salt)
-        .unwrap()
-        .to_string();
 
     let user_res = user::Entity::find()
         .filter(user::Column::Email.eq(payload.email.clone()))
@@ -65,6 +60,12 @@ pub async fn create_user(
             })),
         );
     }
+
+    let salt = SaltString::generate(&mut OsRng);
+    let password_hash = argon2
+        .hash_password(payload.password.as_bytes(), &salt)
+        .unwrap()
+        .to_string();
 
     let validation = Uuid::new_v4();
 
