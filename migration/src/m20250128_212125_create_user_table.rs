@@ -11,25 +11,17 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(User::Table)
                     .if_not_exists()
-                    .col(ColumnDef::new(User::Id)
-                        .unsigned()
-                        .not_null()
-                        .auto_increment()
-                        .primary_key()
+                    .col(
+                        ColumnDef::new(User::Id)
+                            .unsigned()
+                            .not_null()
+                            .auto_increment()
+                            .primary_key(),
                     )
-                    .col(ColumnDef::new(User::Name)
-                        .string()
-                        .not_null()
-                    )
-                    .col(ColumnDef::new(User::Email)
-                        .string()
-                        .not_null()
-                        .unique_key()
-                    )
-                    .col(ColumnDef::new(User::Password)
-                        .string()
-                        .not_null()
-                    )
+                    .col(ColumnDef::new(User::Name).string().not_null())
+                    .col(ColumnDef::new(User::Email).string().not_null().unique_key())
+                    .col(ColumnDef::new(User::Password).string().not_null())
+                    .col(ColumnDef::new(User::Activation).uuid())
                     .to_owned(),
             )
             .await
@@ -49,4 +41,5 @@ pub enum User {
     Name,
     Email,
     Password,
+    Activation,
 }
